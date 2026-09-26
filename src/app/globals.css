@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ───────── Brand tokens (from the TrueHub logo: navy / gold / steel grey) ───────── */
+@theme {
+  --color-navy-950: #0b1a33;
+  --color-navy-900: #0e2244;
+  --color-navy-800: #14305a;
+  --color-navy-700: #1b3f73;
+  --color-navy-600: #24518f;
+  --color-navy-500: #2f64ad;
+  --color-navy-300: #8fa7cc;
+  --color-navy-200: #c9d6ea;
+  --color-navy-100: #e3eaf5;
+  --color-navy-50: #f1f5fb;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-gold-700: #8c661a;
+  --color-gold-600: #a67a1f;
+  --color-gold-500: #c9962b;
+  --color-gold-400: #e0b24a;
+  --color-gold-300: #ebc97a;
+  --color-gold-200: #f3dfa8;
+  --color-gold-100: #fbf1da;
+  --color-gold-50: #fdf8ec;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-steel-900: #23262b;
+  --color-steel-800: #3f434a;
+  --color-steel-700: #5c6068;
+  --color-steel-600: #6b6f76;
+  --color-steel-500: #7a7d82;
+  --color-steel-400: #9a9da3;
+  --color-steel-300: #c4c7cc;
+  --color-steel-200: #dde0e4;
+  --color-steel-100: #eef0f3;
+  --color-steel-50: #f7f8fa;
+
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(11, 26, 51, 0.05), 0 10px 30px -14px rgba(11, 26, 51, 0.18);
+  --shadow-lift: 0 2px 6px rgba(11, 26, 51, 0.06), 0 24px 48px -18px rgba(11, 26, 51, 0.3);
+  --shadow-glow: 0 0 0 1px rgba(201, 150, 43, 0.35), 0 12px 40px -10px rgba(201, 150, 43, 0.45);
+
+  --animate-marquee: marquee 50s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.7s ease-out both;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-white font-sans text-steel-800 antialiased; }
+  h1, h2, h3, h4, h5 { @apply font-heading text-navy-900; }
+  ::selection { @apply bg-gold-200 text-navy-900; }
+}
+
+/* ───────── Layout helpers ───────── */
+@utility container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+@utility section-y { @apply py-16 sm:py-20 lg:py-24; }
+
+@utility bg-grid-light {
+  background-image:
+    linear-gradient(to right, rgba(20, 48, 90, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 48, 90, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+@utility bg-grid-dark {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ───────── Buttons, chips, fields ───────── */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gold-500 px-5 py-3 text-sm font-bold text-navy-950 shadow-sm transition hover:bg-gold-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2;
+}
+@utility btn-navy {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-navy-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-navy-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-2;
+}
+@utility btn-outline {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-steel-300 bg-white px-5 py-3 text-sm font-bold text-navy-800 transition hover:border-navy-300 hover:bg-navy-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 focus-visible:ring-offset-2;
+}
+@utility btn-outline-light {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-5 py-3 text-sm font-bold text-white transition hover:border-white/60 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400;
+}
+@utility btn-white {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-navy-800 shadow-sm transition hover:bg-navy-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400;
+}
+@utility chip {
+  @apply inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold;
+}
+@utility eyebrow {
+  @apply inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-gold-600;
+}
+@utility field {
+  @apply w-full rounded-lg border border-steel-300 bg-white px-3.5 py-2.5 text-sm text-navy-900 placeholder:text-steel-400 transition focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/20;
+}
+@utility card {
+  @apply rounded-2xl border border-steel-200 bg-white shadow-card;
 }

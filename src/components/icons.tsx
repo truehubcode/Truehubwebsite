@@ -1,0 +1,58 @@
+import {
+  BadgeCheck,
+  Car,
+  Code,
+  Cog,
+  Droplets,
+  Factory,
+  Fan,
+  Gauge,
+  GraduationCap,
+  Layers,
+  LayoutPanelTop,
+  Leaf,
+  LifeBuoy,
+  MapPin,
+  Mountain,
+  Network,
+  Package,
+  Pill,
+  RefreshCw,
+  Shirt,
+  Sun,
+  Utensils,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
+
+const map: Record<string, LucideIcon> = {
+  box: Package,
+  package: Package,
+  check: BadgeCheck,
+  wrench: Wrench,
+  map: MapPin,
+  panel: LayoutPanelTop,
+  code: Code,
+  gauge: Gauge,
+  refresh: RefreshCw,
+  lifebuoy: LifeBuoy,
+  network: Network,
+  leaf: Leaf,
+  graduation: GraduationCap,
+  shirt: Shirt,
+  pill: Pill,
+  utensils: Utensils,
+  droplets: Droplets,
+  layers: Layers,
+  car: Car,
+  factory: Factory,
+  mountain: Mountain,
+  cog: Cog,
+  fan: Fan,
+  sun: Sun,
+};
+
+export function DynamicIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = map[name] ?? Package;
+  return <Icon className={className} aria-hidden="true" />;
+}
