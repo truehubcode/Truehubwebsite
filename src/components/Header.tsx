@@ -7,25 +7,40 @@ import { ArrowRight, ChevronDown, Clock, Mail, Menu, Phone, X } from "lucide-rea
 import Logo from "./Logo";
 import ProductVisual from "./ProductVisual";
 import { site } from "@/data/site";
-import { categories } from "@/data/categories";
-import { brands } from "@/data/brands";
+import type { CategorySlug } from "@/data/categories";
+import { brands, type BrandSlug } from "@/data/brands";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Products", mega: true },
-  { href: "/brands", label: "Brands" },
-  { href: "/services", label: "Services" },
+/* Top navigation: Products ▾ (brand → Controllers / HMI / Drives …) | Brands ▾ | Solutions | Industries | About | Contact */
+export interface NavItem {
+  label: string;
+  href: string;
+  /** Illustration key for the small icon next to the label. */
+  visual: CategorySlug;
+}
+export interface BrandNav {
+  slug: BrandSlug;
+  name: string;
+  items: NavItem[];
+}
+
+const LINKS = [
+  { href: "/solutions", label: "Solutions" },
   { href: "/industries", label: "Industries" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
+const navBrands = brands.filter((b) => b.nav);
 
-export default function Header({ logoSrc }: { logoSrc?: string }) {
+const linkBase = "rounded-lg px-3.5 py-2 text-[15px] font-semibold transition";
+const linkIdle = "text-steel-700 hover:bg-steel-50 hover:text-navy-800";
+const linkActive = "bg-navy-50 text-navy-800";
+
+export default function Header({ logoSrc, productNav }: { logoSrc?: string; productNav: BrandNav[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [mobileProducts, setMobileProducts] = useState(false);
+  const [mobileGroup, setMobileGroup] = useState<"products" | "brands" | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -41,7 +56,7 @@ export default function Header({ logoSrc }: { logoSrc?: string }) {
     };
   }, [open]);
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href: string) => pathname.startsWith(href);
 
   return (
     <header className="sticky top-0 z-50">
@@ -86,31 +101,81 @@ export default function Header({ logoSrc }: { logoSrc?: string }) {
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
-            {NAV.map((item) =>
-              item.mega ? (
-                <MegaMenu key={item.href} active={isActive(item.href)} />
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "rounded-lg px-3.5 py-2 text-[15px] font-semibold transition",
-                    isActive(item.href)
-                      ? "bg-navy-50 text-navy-800"
-                      : "text-steel-700 hover:bg-steel-50 hover:text-navy-800",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ),
-            )}
+            {/* Products: one column per brand, with that brand's categories underneath */}
+            <Dropdown label="Products" href="/products" active={isActive("/products")} panelClass="w-[760px] xl:w-[900px]">
+              <div className="grid grid-cols-4 divide-x divide-steel-100">
+                {productNav.map((b) => (
+                  <div key={b.slug} className="p-4">
+                    <Link
+                      href={`/brands/${b.slug}`}
+                      className="block font-heading text-sm font-extrabold tracking-tight text-navy-900 hover:text-gold-600"
+                    >
+                      {b.name}
+                    </Link>
+                    <ul className="mt-2 space-y-0.5">
+                      {b.items.map((c) => (
+                        <li key={c.href}>
+                          <Link
+                            href={c.href}
+                            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] font-medium text-steel-700 transition hover:bg-navy-50 hover:text-navy-900"
+                          >
+                            <span className="grid h-6 w-6 shrink-0 place-items-center rounded bg-steel-50 p-0.5">
+                              <ProductVisual category={c.visual} className="h-full w-full" />
+                            </span>
+                            {c.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={`/products?brand=${b.slug}`}
+                      className="mt-2 inline-flex items-center gap-1 px-2 text-xs font-bold text-navy-700 hover:text-gold-600"
+                    >
+                      All {b.name.split(" ")[0]} <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/products"
+                className="flex items-center justify-between bg-navy-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-navy-700"
+              >
+                All Products <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Dropdown>
+
+            <Dropdown label="Brands" href="/brands" active={isActive("/brands")} panelClass="w-64">
+              <ul className="p-2">
+                {navBrands.map((b) => (
+                  <li key={b.slug}>
+                    <Link
+                      href={`/brands/${b.slug}`}
+                      className="block rounded-lg px-3 py-2 text-sm font-semibold text-navy-900 transition hover:bg-navy-50"
+                    >
+                      {b.name}
+                    </Link>
+                  </li>
+                ))}
+                <li className="mt-1 border-t border-steel-100 pt-1">
+                  <Link
+                    href="/brands"
+                    className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-bold text-navy-700 transition hover:bg-navy-50"
+                  >
+                    All Brands <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </li>
+              </ul>
+            </Dropdown>
+
+            {LINKS.map((item) => (
+              <Link key={item.href} href={item.href} className={cn(linkBase, isActive(item.href) ? linkActive : linkIdle)}>
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <a
-              href={site.phoneHref}
-              className="hidden items-center gap-2 text-sm font-semibold text-navy-800 xl:flex"
-            >
+            <a href={site.phoneHref} className="hidden items-center gap-2 text-sm font-semibold text-navy-800 xl:flex">
               <span className="grid h-9 w-9 place-items-center rounded-full bg-navy-50 text-navy-700">
                 <Phone className="h-4 w-4" />
               </span>
@@ -121,14 +186,20 @@ export default function Header({ logoSrc }: { logoSrc?: string }) {
             </Link>
           </div>
 
-          <button
-            type="button"
-            className="grid h-11 w-11 place-items-center rounded-lg text-navy-800 hover:bg-steel-50 lg:hidden"
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
+          {/* Mobile: quote button always visible + menu */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <Link href="/contact" className="btn-primary px-3.5 py-2 text-xs">
+              Get Quote
+            </Link>
+            <button
+              type="button"
+              className="grid h-11 w-11 place-items-center rounded-lg text-navy-800 hover:bg-steel-50"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -149,7 +220,9 @@ export default function Header({ logoSrc }: { logoSrc?: string }) {
           }}
         >
           <div className="flex items-center justify-between border-b border-steel-100 px-5 py-4">
-            <Logo src={logoSrc} />
+            <Link href="/" aria-label="Home">
+              <Logo src={logoSrc} />
+            </Link>
             <button
               type="button"
               className="grid h-10 w-10 place-items-center rounded-lg text-navy-800 hover:bg-steel-50"
@@ -160,57 +233,72 @@ export default function Header({ logoSrc }: { logoSrc?: string }) {
             </button>
           </div>
           <nav className="flex-1 px-3 py-4" aria-label="Mobile navigation">
-            {NAV.map((item) =>
-              item.mega ? (
-                <div key={item.href}>
-                  <div className="flex items-center">
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex-1 rounded-lg px-3 py-3 text-base font-semibold",
-                        isActive(item.href) ? "text-navy-800" : "text-steel-800",
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setMobileProducts((v) => !v)}
-                      className="grid h-10 w-10 place-items-center rounded-lg text-steel-600"
-                      aria-label="Toggle product categories"
-                      aria-expanded={mobileProducts}
-                    >
-                      <ChevronDown className={cn("h-5 w-5 transition", mobileProducts && "rotate-180")} />
-                    </button>
-                  </div>
-                  {mobileProducts && (
-                    <ul className="mb-2 ml-3 border-l border-steel-200 pl-3">
-                      {categories.map((c) => (
-                        <li key={c.slug}>
-                          <Link
-                            href={`/products?category=${c.slug}`}
-                            className="block rounded-md px-2 py-2 text-sm text-steel-700 hover:bg-navy-50 hover:text-navy-800"
-                          >
-                            {c.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "block rounded-lg px-3 py-3 text-base font-semibold",
-                    isActive(item.href) ? "bg-navy-50 text-navy-800" : "text-steel-800 hover:bg-steel-50",
-                  )}
-                >
-                  {item.label}
+            <MobileGroup
+              label="Products"
+              href="/products"
+              active={isActive("/products")}
+              open={mobileGroup === "products"}
+              onToggle={() => setMobileGroup((g) => (g === "products" ? null : "products"))}
+            >
+              {productNav.map((b) => (
+                <li key={b.slug} className="pb-2">
+                  <Link href={`/brands/${b.slug}`} className="block px-2 pt-2 font-heading text-sm font-extrabold text-navy-900">
+                    {b.name}
+                  </Link>
+                  <ul>
+                    {b.items.map((c) => (
+                      <li key={c.href}>
+                        <Link href={c.href} className="block rounded-md px-4 py-1.5 text-sm text-steel-700 hover:bg-navy-50 hover:text-navy-800">
+                          {c.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+              <li>
+                <Link href="/products" className="block rounded-md px-2 py-2 text-sm font-bold text-navy-800 hover:bg-navy-50">
+                  All Products
                 </Link>
-              ),
-            )}
+              </li>
+            </MobileGroup>
+
+            <MobileGroup
+              label="Brands"
+              href="/brands"
+              active={isActive("/brands")}
+              open={mobileGroup === "brands"}
+              onToggle={() => setMobileGroup((g) => (g === "brands" ? null : "brands"))}
+            >
+              {navBrands.map((b) => (
+                <li key={b.slug}>
+                  <Link
+                    href={`/brands/${b.slug}`}
+                    className="block rounded-md px-2 py-2 text-sm text-steel-700 hover:bg-navy-50 hover:text-navy-800"
+                  >
+                    {b.name}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/brands" className="block rounded-md px-2 py-2 text-sm font-bold text-navy-800 hover:bg-navy-50">
+                  All Brands
+                </Link>
+              </li>
+            </MobileGroup>
+
+            {LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "block rounded-lg px-3 py-3 text-base font-semibold",
+                  isActive(item.href) ? "bg-navy-50 text-navy-800" : "text-steel-800 hover:bg-steel-50",
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
           <div className="space-y-3 border-t border-steel-100 p-5">
             <Link href="/contact" className="btn-primary w-full">
@@ -230,68 +318,73 @@ export default function Header({ logoSrc }: { logoSrc?: string }) {
   );
 }
 
-function MegaMenu({ active }: { active: boolean }) {
-  const featured = brands.filter((b) => b.featured);
+/** Desktop hover/focus dropdown. The label itself links to the section index page. */
+function Dropdown({
+  label,
+  href,
+  active,
+  panelClass,
+  children,
+}: {
+  label: string;
+  href: string;
+  active: boolean;
+  panelClass?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="group relative">
-      <Link
-        href="/products"
+      <Link href={href} className={cn("flex items-center gap-1", linkBase, active ? linkActive : linkIdle)}>
+        {label} <ChevronDown className="h-4 w-4 transition group-hover:rotate-180" />
+      </Link>
+      <div
         className={cn(
-          "flex items-center gap-1 rounded-lg px-3.5 py-2 text-[15px] font-semibold transition",
-          active ? "bg-navy-50 text-navy-800" : "text-steel-700 hover:bg-steel-50 hover:text-navy-800",
+          "invisible absolute left-0 top-full z-40 pt-3 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100",
+          panelClass,
         )}
       >
-        Products <ChevronDown className="h-4 w-4 transition group-hover:rotate-180" />
-      </Link>
-      <div className="invisible absolute left-1/2 top-full z-40 w-[860px] -translate-x-1/2 pt-3 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-        <div className="grid grid-cols-[1.7fr_1fr] overflow-hidden rounded-2xl border border-steel-200 bg-white shadow-lift">
-          <div className="p-6">
-            <p className="eyebrow mb-4">Product categories</p>
-            <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
-              {categories.map((c) => (
-                <li key={c.slug}>
-                  <Link
-                    href={`/products?category=${c.slug}`}
-                    className="flex items-center gap-3 rounded-lg px-2.5 py-2 transition hover:bg-navy-50"
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-steel-50 p-1">
-                      <ProductVisual category={c.slug} className="h-full w-full" />
-                    </span>
-                    <span className="text-[13.5px] font-semibold leading-tight text-navy-900">{c.name}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/products"
-              className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-navy-700 hover:text-gold-600"
-            >
-              View all products <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="bg-navy-50 p-6">
-            <p className="eyebrow mb-4">Featured brands</p>
-            <ul className="space-y-0.5">
-              {featured.map((b) => (
-                <li key={b.slug}>
-                  <Link
-                    href={`/brands/${b.slug}`}
-                    className="block rounded-lg px-3 py-2 text-sm font-semibold text-navy-900 transition hover:bg-white"
-                  >
-                    {b.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/brands"
-              className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-navy-700 hover:text-gold-600"
-            >
-              All {brands.length} brands <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
+        <div className="overflow-hidden rounded-2xl border border-steel-200 bg-white shadow-lift">{children}</div>
       </div>
+    </div>
+  );
+}
+
+/** Mobile accordion group: the label links to the index page, the chevron expands the list. */
+function MobileGroup({
+  label,
+  href,
+  active,
+  open,
+  onToggle,
+  children,
+}: {
+  label: string;
+  href: string;
+  active: boolean;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="flex items-center">
+        <Link
+          href={href}
+          className={cn("flex-1 rounded-lg px-3 py-3 text-base font-semibold", active ? "text-navy-800" : "text-steel-800")}
+        >
+          {label}
+        </Link>
+        <button
+          type="button"
+          onClick={onToggle}
+          className="grid h-10 w-10 place-items-center rounded-lg text-steel-600"
+          aria-label={`Toggle ${label.toLowerCase()} list`}
+          aria-expanded={open}
+        >
+          <ChevronDown className={cn("h-5 w-5 transition", open && "rotate-180")} />
+        </button>
+      </div>
+      {open && <ul className="mb-2 ml-3 border-l border-steel-200 pl-3">{children}</ul>}
     </div>
   );
 }

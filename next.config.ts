@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      // "Services" was renamed to "Solutions"; keep old links working.
+      { source: "/services", destination: "/solutions", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

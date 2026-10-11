@@ -1,4 +1,4 @@
-import type { CategorySlug } from "@/data/categories";
+import type { VisualKey } from "@/data/categories";
 
 const NAVY = "#14305a";
 const NAVY_D = "#0e2244";
@@ -13,7 +13,7 @@ const GREEN = "#22c55e";
  * Clean vector illustrations per product category. Used when a product has no photo.
  * Replace with real photos by setting `image` on the product.
  */
-export default function ProductVisual({ category, className }: { category: CategorySlug; className?: string }) {
+export default function ProductVisual({ category, className }: { category: VisualKey; className?: string }) {
   return (
     <svg viewBox="0 0 200 150" className={className} role="img" aria-label={`${category} illustration`}>
       {art[category]}
@@ -21,7 +21,7 @@ export default function ProductVisual({ category, className }: { category: Categ
   );
 }
 
-const art: Record<CategorySlug, React.ReactNode> = {
+const art: Record<VisualKey, React.ReactNode> = {
   plc: (
     <g>
       <rect x="20" y="40" width="160" height="72" rx="5" fill={LIGHT} stroke={NAVY} strokeWidth="2" />

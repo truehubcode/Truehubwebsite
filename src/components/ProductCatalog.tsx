@@ -11,7 +11,17 @@ import type { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
 
 function haystack(p: Product) {
-  return [p.name, brandMap[p.brand].name, p.series ?? "", p.summary, ...p.highlights, ...p.applications, ...p.specs.flat()]
+  return [
+    p.name,
+    brandMap[p.brand].name,
+    p.series ?? "",
+    p.group ?? "",
+    p.summary,
+    ...p.highlights,
+    ...p.applications,
+    ...p.specs.flat(),
+    ...(p.models ?? []).flat(),
+  ]
     .join(" ")
     .toLowerCase();
 }
@@ -28,6 +38,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
 
   const category = searchParams.get("category") ?? "";
   const brand = searchParams.get("brand") ?? "";
+  const group = searchParams.get("group") ?? "";
   const urlQ = searchParams.get("q") ?? "";
 
   const [q, setQ] = useState(urlQ);
@@ -42,12 +53,14 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
   const deferredQ = useDeferredValue(q);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function pushUrl(next: { q?: string; category?: string; brand?: string }) {
-    const state = { q, category, brand, ...next };
+  function pushUrl(next: { q?: string; category?: string; brand?: string; group?: string }) {
+    // Changing brand drops any brand-specific group filter.
+    const state = { q, category, brand, group: next.brand !== undefined && next.brand !== brand ? "" : group, ...next };
     const params = new URLSearchParams();
     if (state.q) params.set("q", state.q);
     if (state.category) params.set("category", state.category);
     if (state.brand) params.set("brand", state.brand);
+    if (state.group && state.brand) params.set("group", state.group);
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }
@@ -62,7 +75,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
   function clearAll() {
     setQ("");
     setSeenUrlQ("");
-    pushUrl({ q: "", category: "", brand: "" });
+    pushUrl({ q: "", category: "", brand: "", group: "" });
   }
 
   const filtered = useMemo(() => {
@@ -71,13 +84,20 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
       (p) =>
         (!category || p.category === category) &&
         (!brand || p.brand === brand) &&
+        (!group || p.group === group) &&
         (!needle || haystack(p).includes(needle)),
     );
-  }, [products, category, brand, deferredQ]);
+  }, [products, category, brand, group, deferredQ]);
+
+  // Brand-specific groups (the maker's own taxonomy) for the selected brand.
+  const brandGroups = useMemo(
+    () => (brand ? [...new Set(products.filter((p) => p.brand === brand).map((p) => p.group).filter((g): g is string => Boolean(g)))] : []),
+    [products, brand],
+  );
 
   // Paginate with a "Show more" button; reset whenever the filter set changes.
   const PAGE = 24;
-  const filterKey = `${category}|${brand}|${deferredQ}`;
+  const filterKey = `${category}|${brand}|${group}|${deferredQ}`;
   const [limit, setLimit] = useState(PAGE);
   const [seenFilterKey, setSeenFilterKey] = useState(filterKey);
   if (filterKey !== seenFilterKey) {
@@ -90,7 +110,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
     products.filter((p) => p.category === slug && (!brand || p.brand === brand)).length;
 
   const brandName = brand ? brandMap[brand as BrandSlug]?.name : undefined;
-  const activeCount = (category ? 1 : 0) + (brand ? 1 : 0) + (q ? 1 : 0);
+  const activeCount = (category ? 1 : 0) + (brand ? 1 : 0) + (group ? 1 : 0) + (q ? 1 : 0);
 
   const sidebar = (
     <div className="space-y-6">
@@ -189,6 +209,47 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
       </aside>
 
       <div>
+        {/* Brand quick-filter — mirrors the brand-first Products menu */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => pushUrl({ brand: "" })}
+            className={cn("chip transition", !brand ? "border-navy-800 bg-navy-800 text-white" : "border-steel-200 bg-white text-steel-700 hover:border-navy-300")}
+          >
+            All brands
+          </button>
+          {brands.map((b) => (
+            <button
+              key={b.slug}
+              type="button"
+              onClick={() => pushUrl({ brand: brand === b.slug ? "" : b.slug })}
+              className={cn(
+                "chip transition",
+                brand === b.slug ? "border-navy-800 bg-navy-800 text-white" : "border-steel-200 bg-white text-steel-700 hover:border-navy-300",
+              )}
+            >
+              {b.name}
+            </button>
+          ))}
+        </div>
+        {brandGroups.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-steel-500">{brandName} range:</span>
+            {brandGroups.map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => pushUrl({ group: group === g ? "" : g })}
+                className={cn(
+                  "chip transition",
+                  group === g ? "border-gold-500 bg-gold-500 text-navy-950" : "border-steel-200 bg-white text-steel-700 hover:border-gold-400",
+                )}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-steel-600">
             Showing <span className="font-bold text-navy-900">{filtered.length}</span> of {products.length} products
@@ -208,6 +269,11 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
             {brandName && (
               <button type="button" onClick={() => pushUrl({ brand: "" })} className="chip border-navy-200 bg-navy-50 text-navy-800">
                 {brandName} <X className="h-3 w-3" />
+              </button>
+            )}
+            {group && (
+              <button type="button" onClick={() => pushUrl({ group: "" })} className="chip border-gold-200 bg-gold-50 text-gold-700">
+                {group} <X className="h-3 w-3" />
               </button>
             )}
           </div>

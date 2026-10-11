@@ -82,6 +82,24 @@
   background-size: 32px 32px;
 }
 
+/* Hero banner overlay: dark on the text side, fading out over the product image. */
+@layer components {
+  .hero-overlay {
+    background: linear-gradient(180deg, rgba(11, 26, 51, 0.97) 0%, rgba(11, 26, 51, 0.9) 60%, rgba(14, 34, 68, 0.62) 100%);
+  }
+  @media (min-width: 1024px) {
+    .hero-overlay {
+      background: linear-gradient(
+        90deg,
+        rgba(11, 26, 51, 0.98) 0%,
+        rgba(11, 26, 51, 0.94) 40%,
+        rgba(11, 26, 51, 0.62) 60%,
+        rgba(14, 34, 68, 0.12) 100%
+      );
+    }
+  }
+}
+
 /* ───────── Buttons, chips, fields ───────── */
 @utility btn-primary {
   @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gold-500 px-5 py-3 text-sm font-bold text-navy-950 shadow-sm transition hover:bg-gold-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2;

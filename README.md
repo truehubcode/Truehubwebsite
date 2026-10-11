@@ -22,6 +22,7 @@ npm start        # serve the production build
 | Product categories                                    | `src/data/categories.ts`   |
 | Services                                              | `src/data/services.ts`     |
 | Industries                                            | `src/data/industries.ts`   |
+| Home-page slideshow (below the headline)              | `src/data/slides.ts`       |
 
 ### Logo
 Drop the original logo at `public/logo.png` and it is used automatically in the header and footer.

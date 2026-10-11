@@ -3,7 +3,9 @@ import { brands } from "@/data/brands";
 
 /** Scrolling strip of brand wordmarks. Pauses on hover. */
 export default function BrandStrip({ dark = false }: { dark?: boolean }) {
-  const items = [...brands, ...brands];
+  // Repeat the short brand list so the strip stays full; two identical halves keep the loop seamless.
+  const half = Array.from({ length: Math.max(1, Math.ceil(12 / brands.length)) }, () => brands).flat();
+  const items = [...half, ...half];
   return (
     <div
       className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"

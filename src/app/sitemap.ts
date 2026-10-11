@@ -5,7 +5,7 @@ import { brands } from "@/data/brands";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = ["", "/products", "/brands", "/services", "/industries", "/about", "/contact"].map((r) => ({
+  const staticRoutes = ["", "/products", "/brands", "/solutions", "/industries", "/about", "/contact"].map((r) => ({
     url: `${site.url}${r}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

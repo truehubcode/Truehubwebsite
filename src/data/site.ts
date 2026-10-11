@@ -12,7 +12,7 @@ export const site = {
   tagline: "Trusted Products. Reliable Solutions. Real Partnership.",
   pillars: ["Automation", "Integration", "Engineering", "Support"],
   description:
-    "TrueHub Tech & Systems is a B2B supplier of genuine industrial automation products — PLCs, HMIs, AC drives, servo systems, sensors and power supplies from Siemens, Schneider Electric, Delta, ABB, Mitsubishi Electric and more — backed by in-house engineering services and pan-India support.",
+    "TrueHub Tech & Systems is a B2B supplier of genuine industrial automation products — PLCs, HMIs, AC drives, servo systems, sensors and power supplies from HUCEEN, Siemens, Delta Electronics, Mitsubishi Electric and others — backed by in-house engineering services and pan-India support.",
 
   url: "https://www.truehubtech.in", // TODO: your live domain (used for SEO / sitemap)
   phone: "+91 92119 34420",
@@ -42,7 +42,7 @@ export const site = {
   },
 
   stats: [
-    { value: "20+", label: "Global automation brands" },
+    { value: "4", label: "Brand partners, stocked in depth" },
     { value: "1,000+", label: "SKUs ready to ship" },
     { value: "12+", label: "Industries served" },
     { value: "24–48 hr", label: "Dispatch on stock items" },

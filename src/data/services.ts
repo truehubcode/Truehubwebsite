@@ -29,11 +29,11 @@ export const services: Service[] = [
     name: "PLC, HMI & SCADA Programming",
     short: "Application development across all major platforms.",
     description:
-      "Our engineers program and document control logic, HMI screens and SCADA systems on Siemens, Schneider, Delta, Mitsubishi, Omron and ABB platforms.",
+      "Our engineers program and document control logic, HMI screens and SCADA systems on HUCEEN, Siemens, Delta and Mitsubishi Electric platforms.",
     bullets: [
-      "TIA Portal, STEP 7, WinCC",
-      "EcoStruxure Machine Expert / Vijeo",
-      "GX Works, DIAStudio, Sysmac Studio",
+      "TIA Portal, STEP 7-Micro/WIN SMART, WinCC",
+      "GX Works2 / GX Works3, GT Designer3",
+      "ISPSoft, DIAStudio, DOPSoft",
       "Recipe, batch and reporting systems",
       "Structured, documented code hand-over",
     ],

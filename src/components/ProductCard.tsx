@@ -5,7 +5,7 @@ import ProductVisual from "./ProductVisual";
 import { brandMap } from "@/data/brands";
 import { categoryMap } from "@/data/categories";
 import type { Product } from "@/data/products";
-import { quoteHref } from "@/lib/utils";
+import { cn, quoteHref } from "@/lib/utils";
 
 export default function ProductCard({ product }: { product: Product }) {
   const brand = brandMap[product.brand];
@@ -14,12 +14,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <article className="card group flex flex-col overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-lift">
-      <Link href={href} className="block bg-steel-50 p-6" aria-label={product.name}>
+      <Link href={href} className={cn("block p-6", product.image ? "bg-white" : "bg-steel-50")} aria-label={product.name}>
         <div className="relative aspect-[4/3]">
           {product.image ? (
             <Image src={product.image} alt={product.name} fill className="object-contain" sizes="(min-width: 1024px) 320px, 90vw" />
           ) : (
-            <ProductVisual category={product.category} className="h-full w-full" />
+            <ProductVisual category={product.visual ?? product.category} className="h-full w-full" />
           )}
         </div>
       </Link>

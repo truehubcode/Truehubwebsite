@@ -4,12 +4,15 @@ import Logo from "./Logo";
 import { FacebookIcon, InstagramIcon, LinkedInIcon, YouTubeIcon } from "./SocialIcons";
 import { site } from "@/data/site";
 import { categories } from "@/data/categories";
+import { products } from "@/data/products";
+
+const footerCategories = categories.filter((c) => products.some((p) => p.category === c.slug)).slice(0, 9);
 
 const company = [
   { href: "/about", label: "About us" },
   { href: "/products", label: "Products" },
   { href: "/brands", label: "Brands" },
-  { href: "/services", label: "Engineering services" },
+  { href: "/solutions", label: "Solutions" },
   { href: "/industries", label: "Industries" },
   { href: "/contact", label: "Contact & quote" },
 ];
@@ -60,7 +63,7 @@ export default function Footer({ logoSrc, address }: { logoSrc?: string; address
         <div>
           <h4 className="text-sm font-bold uppercase tracking-wider text-white">Products</h4>
           <ul className="mt-4 space-y-2.5 text-sm">
-            {categories.slice(0, 9).map((c) => (
+            {footerCategories.map((c) => (
               <li key={c.slug}>
                 <Link href={`/products?category=${c.slug}`} className="text-navy-200 transition hover:text-gold-400">
                   {c.name}

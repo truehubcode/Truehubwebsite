@@ -8,7 +8,7 @@ import { brands } from "@/data/brands";
 
 export const metadata: Metadata = {
   title: "Products – PLC, HMI, VFD, Servo, Sensors & Power Supplies",
-  description: `Browse ${products.length}+ industrial automation products from ${brands.length} brands including Siemens, Schneider Electric, Delta, ABB, Mitsubishi Electric and Omron. Genuine stock, pan-India delivery.`,
+  description: `Browse ${products.length}+ industrial automation product ranges from ${brands.map((b) => b.name).join(", ")}. Genuine stock, pan-India delivery.`,
 };
 
 export default function ProductsPage() {

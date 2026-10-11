@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, ClipboardList, FileCheck2, Headphones, Truck } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
+import HeroSlider from "@/components/HeroSlider";
 import BrandStrip from "@/components/BrandStrip";
 import ProductVisual from "@/components/ProductVisual";
 import ProductCard from "@/components/ProductCard";
@@ -8,35 +10,44 @@ import FAQ from "@/components/FAQ";
 import QuoteForm from "@/components/QuoteForm";
 import { DynamicIcon } from "@/components/icons";
 import { site } from "@/data/site";
-import { categories, type CategorySlug } from "@/data/categories";
+import { categories } from "@/data/categories";
 import { brands } from "@/data/brands";
 import { products } from "@/data/products";
 import { services } from "@/data/services";
 import { industries } from "@/data/industries";
+import { slides } from "@/data/slides";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const featured = products.filter((p) => p.featured).slice(0, 8);
-  const featuredBrands = brands.filter((b) => b.featured).map((b) => b.name);
+  // Brands named in the hero copy: the four headline brands from the Brands menu, then "others".
+  const heroBrands = brands.filter((b) => b.nav).map((b) => b.name);
 
   return (
     <>
       {/* ───────── Hero ───────── */}
-      <section className="relative overflow-hidden bg-navy-900 text-white">
-        <div className="absolute inset-0 bg-grid-dark opacity-60" />
-        <div className="absolute -right-40 -top-40 h-[560px] w-[560px] rounded-full bg-gold-500/15 blur-3xl" />
-        <div className="absolute -bottom-48 -left-24 h-[420px] w-[420px] rounded-full bg-navy-500/30 blur-3xl" />
-        <div className="container-x relative grid items-center gap-14 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
-          <div className="animate-fade-up">
+      <section className="relative overflow-hidden bg-navy-950 text-white">
+        {/* Full-width banner image behind the headline */}
+        <Image
+          src="/hero/automation-showcase.jpg"
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[70%_center] lg:object-right"
+        />
+        <div className="hero-overlay absolute inset-0" />
+
+        <div className="container-x relative py-20 lg:py-28">
+          <div className="max-w-2xl animate-fade-up">
             <p className="eyebrow text-gold-400">{site.pillars.join(" · ")}</p>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[56px]">
-              Genuine industrial automation products. <span className="text-gold-400">Engineering support</span> you
-              can count on.
+              Engineers first, <span className="text-gold-400">traders second</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-navy-100/90">
-              PLCs, HMIs, AC drives, servo systems, sensors and power supplies from {featuredBrands.slice(0, 5).join(", ")}{" "}
-              and {brands.length - 5} more brands — in stock, competitively priced and backed by our in-house
-              engineering team.
+              PLCs, HMIs, AC drives, servo systems, sensors and power supplies from {heroBrands.join(", ")} and
+              others — in stock, competitively priced and backed by our in-house engineering team.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/products" className="btn-primary">
@@ -56,49 +67,31 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="relative hidden lg:block">
-            <div className="relative mx-auto w-[460px]">
-              <div className="grid grid-cols-2 gap-4">
-                {(
-                  [
-                    ["plc", "SIMATIC S7-1200", "Siemens"],
-                    ["drives", "Altivar ATV320", "Schneider Electric"],
-                    ["hmi", "DOP-100 HMI", "Delta"],
-                    ["servo", "MELSERVO MR-J4", "Mitsubishi Electric"],
-                  ] as [CategorySlug, string, string][]
-                ).map(([cat, name, brand], i) => (
-                  <div
-                    key={cat}
-                    className={cn(
-                      "rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-lift backdrop-blur-sm",
-                      i % 2 === 1 && "translate-y-8",
-                    )}
-                  >
-                    <div className="rounded-xl bg-white p-3">
-                      <ProductVisual category={cat} className="h-28 w-full" />
-                    </div>
-                    <p className="mt-3 text-sm font-bold text-white">{name}</p>
-                    <p className="text-xs text-navy-200">{brand}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="absolute -left-12 top-6 animate-float rounded-xl bg-gold-500 px-4 py-3 text-navy-950 shadow-lift">
-                <p className="text-[11px] font-bold uppercase tracking-wider">Ready stock</p>
-                <p className="text-lg font-extrabold leading-tight">24–48 hr dispatch</p>
-              </div>
-              <div className="absolute -bottom-14 -right-6 rounded-xl border border-white/10 bg-navy-950/85 px-4 py-3 backdrop-blur">
-                <p className="text-[11px] uppercase tracking-wider text-navy-300">Genuine &amp; warranted</p>
-                <p className="text-sm font-bold text-white">{brands.length}+ global brands</p>
-              </div>
+          {/* Floating badges over the banner (stacked bottom-right on desktop, inline on mobile) */}
+          <div className="mt-10 flex flex-wrap gap-3 lg:absolute lg:bottom-12 lg:right-8 lg:mt-0 lg:flex-col lg:items-end">
+            <div className="animate-float rounded-xl bg-gold-500 px-4 py-3 text-navy-950 shadow-lift">
+              <p className="text-[11px] font-bold uppercase tracking-wider">Ready stock</p>
+              <p className="text-lg font-extrabold leading-tight">24–48 hr dispatch</p>
+            </div>
+            <div className="hidden rounded-xl border border-white/10 bg-navy-950/85 px-4 py-3 text-white shadow-lift backdrop-blur lg:block">
+              <p className="text-[11px] uppercase tracking-wider text-navy-300">Genuine &amp; warranted</p>
+              <p className="text-sm font-bold">{brands.length} brand partners</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ───────── Trust bar (the four promises from the logo) ───────── */}
-      <section className="relative z-10 -mt-1 bg-white">
+      {/* ───────── Slideshow (directly below the headline) ───────── */}
+      <section className="bg-white pt-6 sm:pt-8">
         <div className="container-x">
-          <div className="grid gap-px overflow-hidden rounded-2xl border border-steel-200 bg-steel-200 shadow-card sm:grid-cols-2 lg:grid-cols-4 lg:-translate-y-8">
+          <HeroSlider slides={slides} />
+        </div>
+      </section>
+
+      {/* ───────── Trust bar (the four promises from the logo) ───────── */}
+      <section className="bg-white py-8">
+        <div className="container-x">
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-steel-200 bg-steel-200 shadow-card sm:grid-cols-2 lg:grid-cols-4">
             {site.badges.map((b) => (
               <div key={b.title} className="flex gap-4 bg-white p-6">
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-800">
@@ -115,7 +108,7 @@ export default function HomePage() {
       </section>
 
       {/* ───────── Brands ───────── */}
-      <section className="border-b border-steel-100 bg-white pb-10 pt-4 lg:pt-0">
+      <section className="border-b border-steel-100 bg-white pb-10 pt-2">
         <div className="container-x">
           <p className="mb-5 text-center text-xs font-bold uppercase tracking-[0.2em] text-steel-500">
             Brands we supply and support
@@ -138,7 +131,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {categories.map((c) => (
+            {categories.filter((c) => products.some((p) => p.category === c.slug)).map((c) => (
               <Link
                 key={c.slug}
                 href={`/products?category=${c.slug}`}
@@ -248,19 +241,19 @@ export default function HomePage() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <SectionHeading
               tone="dark"
-              eyebrow="Engineering services"
+              eyebrow="Solutions"
               title="More than a parts counter"
               text="Our engineers design panels, write code, commission drives and keep lines running — so you get a working solution, not just a box."
             />
-            <Link href="/services" className="btn-primary shrink-0">
-              All services <ArrowRight className="h-4 w-4" />
+            <Link href="/solutions" className="btn-primary shrink-0">
+              All solutions <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {services.slice(0, 6).map((s) => (
               <Link
                 key={s.slug}
-                href={`/services#${s.slug}`}
+                href={`/solutions#${s.slug}`}
                 className="group rounded-2xl border border-white/10 bg-white/[0.05] p-6 transition hover:border-gold-400/60 hover:bg-white/[0.08]"
               >
                 <span className="grid h-11 w-11 place-items-center rounded-lg bg-gold-500 text-navy-950">

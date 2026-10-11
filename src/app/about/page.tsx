@@ -14,7 +14,7 @@ import { industries } from "@/data/industries";
 
 export const metadata: Metadata = {
   title: "About Us – Industrial Automation Supplier & Engineering Partner",
-  description: `${site.name} supplies genuine automation products from ${brands.length} global brands and delivers panel building, programming, commissioning and repair services across India.`,
+  description: `${site.name} supplies genuine automation products from ${brands.map((b) => b.name).join(", ")} and delivers panel building, programming, commissioning and repair services across India.`,
 };
 
 const values = [
@@ -47,9 +47,10 @@ export default function AboutPage() {
                 wished we could have bought from.
               </p>
               <p>
-                Today we supply genuine PLCs, HMIs, AC drives, servo systems, sensors, power supplies and switchgear from{" "}
-                {brands.length} global brands, keep fast-moving items in ready stock, and back every sale with in-house
-                engineering — panel building, programming, commissioning, retrofits and repairs.
+                Today we supply genuine PLCs, HMIs, AC drives, servo systems, remote I/O, power supplies and control
+                components from our brand partners {brands.map((b) => b.name).join(", ")}, keep fast-moving items in
+                ready stock, and back every sale with in-house engineering — panel building, programming, commissioning,
+                retrofits and repairs.
               </p>
               <p>
                 Whether you are an OEM standardising a control package, an integrator under a deadline or a plant with a
@@ -60,8 +61,8 @@ export default function AboutPage() {
               <Link href="/products" className="btn-navy">
                 Explore products <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/services" className="btn-outline">
-                Engineering services
+              <Link href="/solutions" className="btn-outline">
+                Our solutions
               </Link>
             </div>
           </div>
@@ -99,7 +100,7 @@ export default function AboutPage() {
       <section className="bg-navy-900 py-14 text-white">
         <div className="container-x grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { value: `${brands.length}+`, label: "Global brands supplied" },
+            { value: `${brands.length}`, label: "Brand partners" },
             { value: `${products.length}+`, label: "Product ranges catalogued" },
             { value: `${industries.length}+`, label: "Industries served" },
             { value: "24–48 hr", label: "Dispatch on stock items" },

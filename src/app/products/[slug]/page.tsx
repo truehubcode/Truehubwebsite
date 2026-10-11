@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle2, ChevronRight, Phone } from "lucide-react";
 import ProductVisual from "@/components/ProductVisual";
+import ProductGallery from "@/components/ProductGallery";
 import ProductCard from "@/components/ProductCard";
 import CTA from "@/components/CTA";
 import { WhatsAppIcon } from "@/components/WhatsAppButton";
@@ -82,15 +82,15 @@ export default async function ProductPage({ params }: { params: Params }) {
 
       <section className="bg-white py-10 sm:py-14">
         <div className="container-x grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
-          <div className="card overflow-hidden bg-steel-50 p-8 sm:p-12">
-            <div className="relative aspect-[4/3]">
-              {product.image ? (
-                <Image src={product.image} alt={product.name} fill priority className="object-contain" sizes="(min-width: 1024px) 560px, 90vw" />
-              ) : (
-                <ProductVisual category={product.category} className="h-full w-full" />
-              )}
+          {product.image ? (
+            <ProductGallery name={product.name} image={product.image} gallery={product.gallery} />
+          ) : (
+            <div className="card overflow-hidden bg-steel-50 p-8 sm:p-12">
+              <div className="relative aspect-[4/3]">
+                <ProductVisual category={product.visual ?? product.category} className="h-full w-full" />
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -142,6 +142,7 @@ export default async function ProductPage({ params }: { params: Params }) {
 
       <section className="border-t border-steel-100 bg-steel-50 py-12">
         <div className="container-x grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-6">
           <div className="card overflow-hidden">
             <div className="border-b border-steel-100 px-6 py-4">
               <h2 className="font-heading text-lg font-bold">Key specifications</h2>
@@ -157,6 +158,31 @@ export default async function ProductPage({ params }: { params: Params }) {
             <p className="px-6 py-4 text-xs text-steel-500">
               Specifications are indicative and vary by model. Share your exact part number for a confirmed quotation.
             </p>
+          </div>
+
+          {product.models && product.models.length > 0 && (
+            <div className="card overflow-hidden">
+              <div className="border-b border-steel-100 px-6 py-4">
+                <h2 className="font-heading text-lg font-bold">Models &amp; order codes</h2>
+              </div>
+              <table className="w-full text-sm">
+                <thead className="bg-steel-50 text-left text-[11px] font-bold uppercase tracking-wider text-steel-500">
+                  <tr>
+                    <th className="px-6 py-2.5">Order code / model</th>
+                    <th className="px-6 py-2.5">Description</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-steel-100">
+                  {product.models.map(([code, desc]) => (
+                    <tr key={code}>
+                      <td className="whitespace-nowrap px-6 py-2.5 font-semibold text-navy-900">{code}</td>
+                      <td className="px-6 py-2.5 text-steel-700">{desc}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           </div>
 
           <div className="space-y-6">
